@@ -29,8 +29,73 @@ const userAdjustments = {
     rotation: 0
 };
 
-const activePointers = new Map();
-let previousPinchDistance = null;
+
+const adjustX = document.getElementById('adjustX');
+const adjustY = document.getElementById('adjustY');
+const adjustSize = document.getElementById('adjustSize');
+const adjustRotation = document.getElementById('adjustRotation');
+const resetAdjustments = document.getElementById('resetAdjustments');
+
+
+function updateAdjustmentLabels() {
+    const xLabel = document.getElementById('adjustXValue');
+    const yLabel = document.getElementById('adjustYValue');
+    const sizeLabel = document.getElementById('adjustSizeValue');
+    const rotationLabel = document.getElementById('adjustRotationValue');
+
+    if (xLabel) xLabel.textContent = `${Math.round(userAdjustments.x)}px`;
+    if (yLabel) yLabel.textContent = `${Math.round(userAdjustments.y)}px`;
+    if (sizeLabel) {
+        sizeLabel.textContent =
+            `${Math.round(userAdjustments.scale * 100)}%`;
+    }
+    if (rotationLabel) {
+        rotationLabel.textContent =
+            `${Math.round(userAdjustments.rotation * 180 / Math.PI)}°`;
+    }
+}
+
+adjustX?.addEventListener('input', () => {
+    userAdjustments.x = Number(adjustX.value);
+    updateAdjustmentLabels();
+});
+
+adjustY?.addEventListener('input', () => {
+    userAdjustments.y = Number(adjustY.value);
+    updateAdjustmentLabels();
+});
+
+adjustSize?.addEventListener('input', () => {
+    userAdjustments.scale = Number(adjustSize.value) / 100;
+    updateAdjustmentLabels();
+});
+
+adjustRotation?.addEventListener('input', () => {
+    userAdjustments.rotation =
+        Number(adjustRotation.value) * Math.PI / 180;
+    updateAdjustmentLabels();
+});
+
+resetAdjustments?.addEventListener('click', () => {
+    userAdjustments.x = 0;
+    userAdjustments.y = 0;
+    userAdjustments.scale = 1;
+    userAdjustments.rotation = 0;
+
+    if (adjustX) adjustX.value = 0;
+    if (adjustY) adjustY.value = 0;
+    if (adjustSize) adjustSize.value = 100;
+    if (adjustRotation) adjustRotation.value = 0;
+
+    updateAdjustmentLabels();
+});
+
+updateAdjustmentLabels();
+
+
+let isDragging = false;
+let lastPointerX = 0;
+let lastPointerY = 0;
 
 const scene = new THREE.Scene();
 
@@ -364,87 +429,48 @@ function positionJewellery(landmarks) {
     }
 }
 
+
 const gestureArea = document.querySelector('.camera-stage');
 
 if (gestureArea) {
     gestureArea.style.touchAction = 'none';
 
-    function pointerDistance() {
-        const points = [...activePointers.values()];
-        if (points.length < 2) return null;
-
-        return Math.hypot(
-            points[1].x - points[0].x,
-            points[1].y - points[0].y
-        );
-    }
-
     gestureArea.addEventListener('pointerdown', event => {
         if (!isRunning || !jewelleryMesh?.visible) return;
+
+        // Only allow the left mouse button on a computer.
+        if (event.pointerType === 'mouse' && event.button !== 0) return;
 
         event.preventDefault();
         gestureArea.setPointerCapture(event.pointerId);
 
-        activePointers.set(event.pointerId, {
-            x: event.clientX,
-            y: event.clientY
-        });
-
-        if (activePointers.size === 2) {
-            previousPinchDistance = pointerDistance();
-        }
+        isDragging = true;
+        lastPointerX = event.clientX;
+        lastPointerY = event.clientY;
     });
 
     gestureArea.addEventListener('pointermove', event => {
-        if (!activePointers.has(event.pointerId)) return;
+        if (!isDragging) return;
 
         event.preventDefault();
 
-        const previous = activePointers.get(event.pointerId);
-        const dx = event.clientX - previous.x;
-        const dy = event.clientY - previous.y;
+        const dx = event.clientX - lastPointerX;
+        const dy = event.clientY - lastPointerY;
 
-        activePointers.set(event.pointerId, {
-            x: event.clientX,
-            y: event.clientY
-        });
+        userAdjustments.x += dx;
+        userAdjustments.y += dy;
 
-        if (activePointers.size === 1) {
-            // One finger or mouse: move the jewellery.
-            userAdjustments.x += dx;
-            userAdjustments.y += dy;
-        } else if (activePointers.size === 2) {
-            // Two fingers: pinch to resize the jewellery.
-            const currentDistance = pointerDistance();
-
-            if (
-                previousPinchDistance &&
-                currentDistance &&
-                previousPinchDistance > 0
-            ) {
-                const ratio = currentDistance / previousPinchDistance;
-
-                userAdjustments.scale = Math.max(
-                    0.5,
-                    Math.min(2, userAdjustments.scale * ratio)
-                );
-            }
-
-            previousPinchDistance = currentDistance;
-        }
+        lastPointerX = event.clientX;
+        lastPointerY = event.clientY;
     });
 
-    function endPointer(event) {
-        activePointers.delete(event.pointerId);
-
-        previousPinchDistance = activePointers.size === 2
-            ? pointerDistance()
-            : null;
+    function stopDragging() {
+        isDragging = false;
     }
 
-    gestureArea.addEventListener('pointerup', endPointer);
-    gestureArea.addEventListener('pointercancel', endPointer);
-    gestureArea.addEventListener('lostpointercapture', endPointer);
+    gestureArea.addEventListener('pointerup', stopDragging);
+    gestureArea.addEventListener('pointercancel', stopDragging);
+    gestureArea.addEventListener('lostpointercapture', stopDragging);
 }
 
 function renderLoop() {
