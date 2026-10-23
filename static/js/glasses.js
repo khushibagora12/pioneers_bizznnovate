@@ -1,3 +1,4 @@
+
 export function positionGlasses(landmarks, mesh, canvas) {
     const width = canvas.clientWidth || canvas.width;
     const height = canvas.clientHeight || canvas.height;
@@ -13,10 +14,17 @@ export function positionGlasses(landmarks, mesh, canvas) {
     const centerX = (left.x + right.x) / 2;
     const centerY = (left.y + right.y) / 2;
 
-    // Move the shades slightly down.
+    const eyeDistance = Math.hypot(
+        right.x - left.x,
+        right.y - left.y
+    );
+
+    // Small downward adjustment relative to face size.
+    const verticalOffset = eyeDistance * 0.05;
+
     mesh.position.set(
         centerX,
-        centerY - height * 0.025,
+        centerY - verticalOffset,
         0
     );
 

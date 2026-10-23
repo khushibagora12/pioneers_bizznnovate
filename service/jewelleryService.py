@@ -5,11 +5,31 @@ JEWELLERY_BASE_DIR = Path(__file__).resolve().parent.parent / "static" / "images
 
 JEWELLERY_METADATA = {
     # Earrings
-    "ej1": {"name": "Gold Hoop Earrings", "price": 49.99},
-    "ej2": {"name": "Elegant Earrings", "price": 49.99},
+    "ej1": {
+        "name": "Gold Hoop Earrings", 
+        "price": 49.99,
+        "width_mm": 25,
+        "height_mm": 30,
+    },
+    "ej2": {
+        "name": "Elegant Earrings", 
+        "price": 49.99,
+        "width_mm": 25,
+        "height_mm": 30
+    },
     # Shades
-    "sj1": {"name": "Aviator Sunglasses", "price": 49.99},
-    "sj2": {"name": "Stylish Sunglasses", "price": 49.99},
+    "sj1": {
+        "name": "Aviator Sunglasses", 
+        "price": 49.99,
+        "width_mm": 140,
+        "height_mm": 50
+    },
+    "sj2": {
+        "name": "Stylish Sunglasses",
+        "price": 49.99,
+        "width_mm": 140,
+        "height_mm": 50
+    },
 }
 SUPPORTED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp"}
 
@@ -22,7 +42,6 @@ def share_jewellery_data():
     categories = [
         ("Earrings", "earrings"),
         ("Shades", "shades"),
-        ("Necklaces", "necklaces"),
     ]
 
     data = {}
@@ -45,12 +64,15 @@ def share_jewellery_data():
                 meta = JEWELLERY_METADATA.get(stem, {})
                 name = meta.get("name") or stem.replace("_", " ").title()
                 price = meta.get("price", 49.99)
-
+                width_mm = meta.get("width_mm")
+                height_mm = meta.get("height_mm")
                 items.append({
                     "id": idx,
                     "name": name,
                     "image": f"/static/images/jewellery/{folder_name}/{file.name}",
-                    "price": price
+                    "price": price,
+                    "width_mm": width_mm,
+                    "height_mm": height_mm,
                 })
 
         data[display_category] = items

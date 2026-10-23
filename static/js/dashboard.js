@@ -1,3 +1,4 @@
+
 const grid = document.getElementById("productGrid");
 const title = document.getElementById("sectionTitle");
 const count = document.getElementById("productCount");
@@ -6,46 +7,37 @@ const emptyState = document.getElementById("emptyState");
 const categoryNames = {
     all: "All products",
     earrings: "Earrings",
-    necklaces: "Necklaces",
     shades: "Shades"
 };
 
 let products = [];
-console.log("in js")
+
 async function loadProducts() {
     try {
         const response = await fetch("/jewellery");
 
         if (!response.ok) {
-            throw new Error(`API error: ${response.status}`);
+            throw new Error("Failed to fetch products");
         }
 
         const data = await response.json();
-        console.log("Products fetched successfully:", data);
+
         products = [
-            ...(data.Earrings ?? []).map(item => ({
+            ...(data.Earrings || []).map(item => ({
                 ...item,
                 category: "earrings"
             })),
-            ...(data.Necklaces ?? []).map(item => ({
-                ...item,
-                category: "necklaces"
-            })),
-            ...(data.Shades ?? []).map(item => ({
+            ...(data.Shades || []).map(item => ({
                 ...item,
                 category: "shades"
             }))
         ];
-
         renderProducts();
-    }
-    catch (error) {
-        console.error("Failed to load products:", error);
+    } catch (error) {
+        console.error(error);
         grid.replaceChildren();
-
-        const message = document.createElement("p");
-        message.textContent = "Unable to load products. Please try again.";
-        grid.appendChild(message);
+        emptyState.textContent = "Unable to load products. Please try again.";
+        emptyState.style.display = "block";
     }
 }
 
@@ -54,10 +46,11 @@ function renderProducts(category = "all") {
         category === "all" || product.category === category
     );
 
-    title.textContent = categoryNames[category] ?? "Products";
+    title.textContent = categoryNames[category];
     count.textContent = `${filtered.length} product${filtered.length === 1 ? "" : "s"}`;
 
     grid.replaceChildren();
+    emptyState.textContent = "No products found.";
     emptyState.style.display = filtered.length ? "none" : "block";
 
     filtered.forEach(product => {
@@ -68,16 +61,15 @@ function renderProducts(category = "all") {
         const imageBox = document.createElement("div");
         imageBox.className = "product-image";
 
-
         const image = document.createElement("img");
         image.src = product.image;
         image.alt = product.name;
         image.loading = "lazy";
-        console.log("Rendering product:", product.name, "Image URL:", product.image);
 
         image.onerror = () => {
             imageBox.textContent = "Image unavailable";
         };
+
         imageBox.appendChild(image);
 
         const info = document.createElement("div");
@@ -87,10 +79,9 @@ function renderProducts(category = "all") {
         name.textContent = product.name;
 
         const categoryLabel = document.createElement("p");
-        categoryLabel.textContent =
-            categoryNames[product.category] ?? product.category;
+        categoryLabel.textContent = categoryNames[product.category];
 
-        const tryOn = document.createElement("div");
+        const tryOn = document.createElement("span");
         tryOn.className = "try-on-btn";
         tryOn.textContent = "Try this on";
 
@@ -103,7 +94,7 @@ function renderProducts(category = "all") {
                 category: product.category
             });
 
-            window.location.href = `/try-on?${params.toString()}`;
+            window.location.href = `/try-on?${params}`;
         });
 
         grid.appendChild(card);

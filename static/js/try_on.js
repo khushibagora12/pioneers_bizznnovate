@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const productName = document.getElementById('productName');
     const productCategory = document.getElementById('productCategory');
     const productPrice = document.getElementById('productPrice');
+    const productSize = document.getElementById('productSize');
     const changeProduct = document.getElementById('changeProduct');
     const captureButton = document.getElementById('captureButton');
     const status = document.getElementById('status');
@@ -83,16 +84,23 @@ document.addEventListener('DOMContentLoaded', async () => {
         productImage.hidden = false;
 
         productName.textContent = product.name || 'Selected design';
+
         productPrice.textContent =
             product.price != null ? `₹${product.price}` : '';
 
+        productSize.textContent =
+            product.width_mm != null && product.height_mm != null
+                ? `Size: ${product.width_mm} × ${product.height_mm} mm`
+                : 'Size information unavailable';
         document.title = `${product.name || 'Virtual Try-On'} | LUMIAR`;
 
         window.AR_PRODUCT = {
             category,
             productId,
             imageUrl: arData.image_url,
-            image
+            image,
+            width_mm: product.width_mm,
+            height_mm: product.height_mm
         };
 
         window.dispatchEvent(

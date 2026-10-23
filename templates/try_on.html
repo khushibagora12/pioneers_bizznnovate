@@ -229,6 +229,13 @@
             margin-bottom: 10px;
         }
 
+        #productSize {
+            font-size: 13px;
+            color: #817469;
+            margin-top: -12px;
+            margin-bottom: 20px;
+        }
+
         #productPrice {
             font-size: 18px;
             font-weight: 700;
@@ -263,6 +270,42 @@
             border: none;
             background: #3e332a;
             color: white;
+        }
+
+        .ar-adjustments {
+            margin-top: 22px;
+            padding-top: 18px;
+            border-top: 1px solid #e9e1d8;
+        }
+
+        .ar-adjustments h3 {
+            font-size: 16px;
+            margin-bottom: 16px;
+        }
+
+        .ar-adjustments label {
+            display: flex;
+            justify-content: space-between;
+            margin: 14px 0 6px;
+            color: #594737;
+            font-size: 13px;
+        }
+
+        .ar-adjustments input[type="range"] {
+            width: 100%;
+            accent-color: #a87942;
+            cursor: pointer;
+        }
+
+        #resetARAdjustments {
+            width: 100%;
+            margin-top: 16px;
+            padding: 10px;
+            border: 1px solid #ded3c7;
+            border-radius: 8px;
+            background: white;
+            color: #594737;
+            cursor: pointer;
         }
 
         .note {
@@ -355,6 +398,7 @@
                 <h3 id="productName">Loading product...</h3>
                 <p id="productCategory"></p>
                 <p id="productPrice"></p>
+                <p id="productSize"></p>
 
                 <div class="product-actions">
                     <button id="captureButton" type="button" disabled>
@@ -363,6 +407,34 @@
 
                     <button id="changeProduct" type="button">
                         Explore other designs
+                    </button>
+                </div>
+
+                <div class="ar-adjustments">
+                    <h3>Adjust your try-on</h3>
+
+                    <label for="arMoveX">
+                        Horizontal position <span id="arMoveXValue">0px</span>
+                    </label>
+                    <input id="arMoveX" type="range" min="-100" max="100" value="0">
+
+                    <label for="arMoveY">
+                        Vertical position <span id="arMoveYValue">0px</span>
+                    </label>
+                    <input id="arMoveY" type="range" min="-100" max="100" value="0">
+
+                    <label for="arScale">
+                        Size <span id="arScaleValue">100%</span>
+                    </label>
+                    <input id="arScale" type="range" min="50" max="150" value="100">
+
+                    <label for="arRotation">
+                        Rotation <span id="arRotationValue">0°</span>
+                    </label>
+                    <input id="arRotation" type="range" min="-30" max="30" value="0">
+
+                    <button id="resetARAdjustments" type="button">
+                        Reset adjustments
                     </button>
                 </div>
 
@@ -375,14 +447,18 @@
         </div>
     </main>
 
+    <div id="arPageConfig" data-category="{{ category }}" data-product-id="{{ product_id }}" hidden></div>
+
     <script>
+        const configElement = document.getElementById('arPageConfig');
         window.AR_PAGE_CONFIG = {
-            category: {{ category | tojson }},
-        productId: { { product_id | tojson } }
-    };
+            category: configElement ? configElement.dataset.category : '',
+            productId: configElement ? configElement.dataset.productId : ''
+        };
     </script>
 
     <script src="{{ url_for('static', filename='js/try_on.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/ar_adjustment.js') }}"></script>
     <script type="module" src="{{ url_for('static', filename='js/ar.js') }}"></script>
 </body>
 

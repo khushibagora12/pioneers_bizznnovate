@@ -1,7 +1,6 @@
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js'
 import { positionEarrings } from './earrings.js';
 import { positionGlasses } from './glasses.js';
-import { positionNecklace } from './necklace.js';
 
 const video = document.getElementById('camera');
 const canvas = document.getElementById('canvas');
@@ -23,6 +22,15 @@ let jewelleryTexture = null;
 let selectedCategory = null;
 let jewelleryMesh = null;
 let rightEarringMesh = null;
+const userAdjustments = {
+    x: 0,
+    y: 0,
+    scale: 1,
+    rotation: 0
+};
+
+const activePointers = new Map();
+let previousPinchDistance = null;
 
 const scene = new THREE.Scene();
 
@@ -56,8 +64,6 @@ const MODEL_URL =
 const categoryNames = {
     earrings: 'Earrings',
     shades: 'Shades',
-    necklaces: 'Necklaces',
-    necklace: 'Necklaces'
 };
 
 function setStatus(message) {
@@ -70,6 +76,11 @@ function setARProduct(product) {
     const category = String(product.category || '').toLowerCase();
 
     if (!categoryNames[category]) {
+        userAdjustments.x = 0;
+        userAdjustments.y = 0;
+        userAdjustments.scale = 1;
+        userAdjustments.rotation = 0;
+
         selectedImage = null;
         selectedCategory = null;
         removeJewellery();
@@ -127,7 +138,7 @@ function loadJewelleryTexture(image) {
     const material = new THREE.MeshBasicMaterial({
         map: jewelleryTexture,
         transparent: true,
-        opacity: selectedCategory === 'shades' ? 0.5 : 1,
+        opacity: 1,
         side: THREE.DoubleSide,
         depthTest: false,
         depthWrite: false
@@ -292,9 +303,7 @@ function positionJewellery(landmarks) {
 
     const widthFactors = {
         earrings: 0.50,
-        shades: 1.85,
-        necklaces: 1.35,
-        necklace: 1.35
+        shades: 1.5,
     };
 
     const factor = widthFactors[selectedCategory];
@@ -332,16 +341,110 @@ function positionJewellery(landmarks) {
             positionGlasses(landmarks, jewelleryMesh, canvas);
             break;
 
-        case 'necklaces':
-        case 'necklace':
-            if (rightEarringMesh) rightEarringMesh.visible = false;
-            positionNecklace(landmarks, jewelleryMesh, canvas);
-            break;
-
         default:
             jewelleryMesh.visible = false;
             if (rightEarringMesh) rightEarringMesh.visible = false;
     }
+    function applyUserAdjustment(mesh) {
+        if (!mesh || !mesh.visible) return;
+
+        mesh.position.x += userAdjustments.x;
+        mesh.position.y -= userAdjustments.y;
+
+        mesh.scale.x *= userAdjustments.scale;
+        mesh.scale.y *= userAdjustments.scale;
+
+        mesh.rotation.z += userAdjustments.rotation;
+    }
+
+    applyUserAdjustment(jewelleryMesh);
+
+    if (selectedCategory === 'earrings') {
+        applyUserAdjustment(rightEarringMesh);
+    }
+}
+
+const gestureArea = document.querySelector('.camera-stage');
+
+if (gestureArea) {
+    gestureArea.style.touchAction = 'none';
+
+    function pointerDistance() {
+        const points = [...activePointers.values()];
+        if (points.length < 2) return null;
+
+        return Math.hypot(
+            points[1].x - points[0].x,
+            points[1].y - points[0].y
+        );
+    }
+
+    gestureArea.addEventListener('pointerdown', event => {
+        if (!isRunning || !jewelleryMesh?.visible) return;
+
+        event.preventDefault();
+        gestureArea.setPointerCapture(event.pointerId);
+
+        activePointers.set(event.pointerId, {
+            x: event.clientX,
+            y: event.clientY
+        });
+
+        if (activePointers.size === 2) {
+            previousPinchDistance = pointerDistance();
+        }
+    });
+
+    gestureArea.addEventListener('pointermove', event => {
+        if (!activePointers.has(event.pointerId)) return;
+
+        event.preventDefault();
+
+        const previous = activePointers.get(event.pointerId);
+        const dx = event.clientX - previous.x;
+        const dy = event.clientY - previous.y;
+
+        activePointers.set(event.pointerId, {
+            x: event.clientX,
+            y: event.clientY
+        });
+
+        if (activePointers.size === 1) {
+            // One finger or mouse: move the jewellery.
+            userAdjustments.x += dx;
+            userAdjustments.y += dy;
+        } else if (activePointers.size === 2) {
+            // Two fingers: pinch to resize the jewellery.
+            const currentDistance = pointerDistance();
+
+            if (
+                previousPinchDistance &&
+                currentDistance &&
+                previousPinchDistance > 0
+            ) {
+                const ratio = currentDistance / previousPinchDistance;
+
+                userAdjustments.scale = Math.max(
+                    0.5,
+                    Math.min(2, userAdjustments.scale * ratio)
+                );
+            }
+
+            previousPinchDistance = currentDistance;
+        }
+    });
+
+    function endPointer(event) {
+        activePointers.delete(event.pointerId);
+
+        previousPinchDistance = activePointers.size === 2
+            ? pointerDistance()
+            : null;
+    }
+
+    gestureArea.addEventListener('pointerup', endPointer);
+    gestureArea.addEventListener('pointercancel', endPointer);
+    gestureArea.addEventListener('lostpointercapture', endPointer);
 }
 
 function renderLoop() {
