@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual Try-On | LUMIAR</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #faf8f5;
+            color: #302821;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 6%;
+            background: white;
+            border-bottom: 1px solid #e8dfd5;
+        }
+
+        .logo {
+            font-size: 23px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .logo span {
+            color: #a87942;
+        }
+
+        .back-link {
+            color: #594737;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        main {
+            max-width: 1200px;
+            margin: auto;
+            padding: 30px 24px;
+        }
+
+        .page-heading {
+            margin-bottom: 25px;
+        }
+
+        .page-heading h1 {
+            font-size: clamp(25px, 4vw, 34px);
+            margin-bottom: 8px;
+        }
+
+        .page-heading p {
+            color: #796e63;
+            line-height: 1.5;
+        }
+
+        .try-on-layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1.6fr) minmax(260px, 0.8fr);
+            gap: 25px;
+            align-items: start;
+        }
+
+        .camera-panel {
+            overflow: hidden;
+            border-radius: 16px;
+            background: #211e1b;
+            box-shadow: 0 8px 25px rgba(48, 40, 33, 0.1);
+        }
+
+        .camera-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 16px 18px;
+            color: white;
+        }
+
+        .camera-header h2 {
+            font-size: 17px;
+        }
+
+        #status {
+            font-size: 12px;
+            color: #e3c7a3;
+            text-align: right;
+        }
+
+        .camera-stage {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 4 / 5;
+            max-height: 680px;
+            overflow: hidden;
+            background: #37312b;
+        }
+
+        #camera,
+        #canvas {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        #camera {
+            transform: scaleX(-1);
+            display: none;
+        }
+
+        #canvas {
+            pointer-events: none;
+        }
+
+        #placeholder {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            padding: 25px;
+            color: #f5eee6;
+            text-align: center;
+        }
+
+        #placeholder .camera-icon {
+            font-size: 44px;
+        }
+
+        #placeholder p {
+            color: #d2c5b8;
+            font-size: 14px;
+            line-height: 1.6;
+            max-width: 300px;
+        }
+
+        .camera-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 16px;
+        }
+
+        .btn {
+            flex: 1;
+            min-width: 110px;
+            padding: 12px 14px;
+            border: 0;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background: #b18a60;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #987147;
+        }
+
+        .btn-secondary {
+            background: #4a4037;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #615348;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .product-panel {
+            padding: 20px;
+            border: 1px solid #e9e1d8;
+            border-radius: 16px;
+            background: white;
+        }
+
+        .product-panel h2 {
+            font-size: 20px;
+            margin-bottom: 16px;
+        }
+
+        .selected-product-image {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 250px;
+            padding: 15px;
+            border-radius: 12px;
+            background: #f4f0eb;
+            margin-bottom: 18px;
+        }
+
+        #productImage {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        #productName {
+            font-size: 19px;
+            margin-bottom: 8px;
+        }
+
+        #productCategory {
+            color: #817469;
+            font-size: 13px;
+            margin-bottom: 10px;
+        }
+
+        #productPrice {
+            font-size: 18px;
+            font-weight: 700;
+            color: #a87942;
+            margin-bottom: 20px;
+        }
+
+        .product-actions {
+            display: grid;
+            gap: 10px;
+        }
+
+        .product-actions a,
+        .product-actions button {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            text-decoration: none;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        #changeProduct {
+            border: 1px solid #ded3c7;
+            background: white;
+            color: #594737;
+        }
+
+        #captureButton {
+            border: none;
+            background: #3e332a;
+            color: white;
+        }
+
+        .note {
+            margin-top: 18px;
+            color: #817469;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 760px) {
+            main {
+                padding: 24px 15px;
+            }
+
+            .try-on-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .camera-stage {
+                aspect-ratio: 3 / 4;
+            }
+
+            .product-panel {
+                order: -1;
+            }
+
+            .selected-product-image {
+                height: 180px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="logo">LUMI<span>AR</span></div>
+        <a class="back-link" href="/">&larr; Back to products</a>
+    </header>
+
+    <main>
+        <section class="page-heading">
+            <h1>Virtual Try-On</h1>
+            <p>See how your selected design looks on you.</p>
+        </section>
+
+        <div class="try-on-layout">
+            <section class="camera-panel">
+                <div class="camera-header">
+                    <h2>Live preview</h2>
+                    <span id="status" role="status" aria-live="polite">
+                        Camera not started
+                    </span>
+                </div>
+
+                <div class="camera-stage">
+                    <video id="camera" autoplay playsinline muted></video>
+
+                    <canvas id="canvas"></canvas>
+
+                    <div id="placeholder">
+                        <div class="camera-icon" aria-hidden="true">
+                            &#128247;
+                        </div>
+                        <h3>Ready for your try-on?</h3>
+                        <p>
+                            Start your camera and allow camera access
+                            to see the selected product on your face.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="camera-controls">
+                    <button class="btn btn-primary" id="startButton" type="button">
+                        Start camera
+                    </button>
+
+                    <button class="btn btn-secondary" id="stopButton" type="button" disabled>
+                        Stop camera
+                    </button>
+                </div>
+            </section>
+
+            <aside class="product-panel">
+                <h2>Selected design</h2>
+
+                <div class="selected-product-image">
+                    <img id="productImage" src="" alt="Selected jewellery" hidden>
+                </div>
+
+                <h3 id="productName">Loading product...</h3>
+                <p id="productCategory"></p>
+                <p id="productPrice"></p>
+
+                <div class="product-actions">
+                    <button id="captureButton" type="button" disabled>
+                        Capture look
+                    </button>
+
+                    <button id="changeProduct" type="button">
+                        Explore other designs
+                    </button>
+                </div>
+
+                <p class="note">
+                    For the best results, face the camera directly and
+                    use good lighting. AR alignment depends on the
+                    product image and tracking quality.
+                </p>
+            </aside>
+        </div>
+    </main>
+
+    <script>
+        window.AR_PAGE_CONFIG = {
+            category: {{ category | tojson }},
+        productId: { { product_id | tojson } }
+    };
+    </script>
+
+    <script src="{{ url_for('static', filename='js/try_on.js') }}"></script>
+    <script type="module" src="{{ url_for('static', filename='js/ar.js') }}"></script>
+</body>
+
+</html>

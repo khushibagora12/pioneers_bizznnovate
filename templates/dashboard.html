@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jewellery AR | Dashboard</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #faf8f5;
+            color: #302821;
+        }
+
+        header {
+            padding: 22px 7%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e8dfd5;
+            background: #fff;
+        }
+
+        .logo {
+            font-size: 23px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .logo span {
+            color: #a87942;
+        }
+
+        header p {
+            color: #74675b;
+            font-size: 14px;
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 42px 24px;
+        }
+
+        .intro {
+            margin-bottom: 32px;
+        }
+
+        .intro h1 {
+            font-size: clamp(28px, 4vw, 38px);
+            margin-bottom: 10px;
+        }
+
+        .intro p {
+            color: #796e63;
+            line-height: 1.6;
+        }
+
+        .categories {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+
+        .category-btn {
+            border: 1px solid #ded3c7;
+            border-radius: 30px;
+            background: #fff;
+            padding: 11px 23px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: 0.2s;
+        }
+
+        .category-btn:hover,
+        .category-btn.active {
+            background: #3e332a;
+            color: white;
+            border-color: #3e332a;
+        }
+
+        .section-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 12px;
+        }
+
+        .section-heading h2 {
+            font-size: 22px;
+        }
+
+        #productCount {
+            color: #85766a;
+            font-size: 14px;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 22px;
+        }
+
+        .product-card {
+            border: 1px solid #e9e1d8;
+            border-radius: 14px;
+            overflow: hidden;
+            background: white;
+            cursor: pointer;
+            text-align: left;
+            color: inherit;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-4px);
+            border-color: #b18a60;
+        }
+
+        .product-card.selected {
+            border: 2px solid #a87942;
+        }
+
+        .product-image {
+            height: 240px;
+            background: #f4f0eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 18px;
+        }
+
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .product-info {
+            padding: 17px;
+        }
+
+        .product-info h3 {
+            font-size: 17px;
+            margin-bottom: 7px;
+        }
+
+        .product-info p {
+            color: #817469;
+            font-size: 13px;
+        }
+
+        .try-on-btn {
+            margin-top: 15px;
+            width: 100%;
+            padding: 11px;
+            border: none;
+            border-radius: 7px;
+            background: #3e332a;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .try-on-btn:hover {
+            background: #594737;
+        }
+
+        .empty-state {
+            display: none;
+            padding: 40px 10px;
+            text-align: center;
+            color: #85766a;
+        }
+
+        @media (max-width: 750px) {
+            main {
+                padding: 30px 16px;
+            }
+
+            .product-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 14px;
+            }
+
+            .product-image {
+                height: 180px;
+            }
+
+            .product-info {
+                padding: 12px;
+            }
+        }
+
+        @media (max-width: 420px) {
+            .product-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .product-image {
+                height: 230px;
+            }
+
+            header p {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="logo">LUMI<span>AR</span></div>
+        <p>Discover your look</p>
+    </header>
+
+    <main>
+        <section class="intro">
+            <h1>Find your perfect look.</h1>
+            <p>Explore jewellery and eyewear, select a design, and try it on virtually.</p>
+        </section>
+
+        <nav class="categories" aria-label="Product categories">
+            <button class="category-btn active" data-category="all">All</button>
+            <button class="category-btn" data-category="earrings">Earrings</button>
+            <button class="category-btn" data-category="necklaces">Necklaces</button>
+            <button class="category-btn" data-category="shades">Shades</button>
+        </nav>
+
+        <section>
+            <div class="section-heading">
+                <h2 id="sectionTitle">All products</h2>
+                <span id="productCount"></span>
+            </div>
+
+            <div class="product-grid" id="productGrid"></div>
+
+            <div class="empty-state" id="emptyState">
+                No products found in this category.
+            </div>
+        </section>
+    </main>
+
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+</body>
+
+</html>
