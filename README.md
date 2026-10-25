@@ -4,6 +4,8 @@ LUMIAR is a web-based Augmented Reality (AR) application that lets users browse 
 
 Everything runs directly inside the browser using client-side AI, providing a fast, smooth, and privacy-friendly virtual try-on experience without needing any app installation.
 
+LUMIAR is designed to run directly in modern web browsers without requiring users to install a separate application. Its client-side computer vision pipeline processes camera frames locally on the device, helping protect user privacy by avoiding the transmission of camera footage to the application server.
+
 ---
 
 ## Key Features Implemented
@@ -103,4 +105,4 @@ Open your browser and navigate to:
 ```
 http://127.0.0.1:5000
 ```
-Allow camera access when prompted on the try-on page to begin testing!
+Allow camera access when prompted on the try-on page to begin testing! 
