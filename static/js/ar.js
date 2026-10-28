@@ -293,6 +293,14 @@ async function startCamera() {
         isRunning = true;
         lastVideoTime = -1;
 
+        // Emit try_on_started only after camera + face tracker initialize.
+        if (window.AR_PRODUCT && window.AHITracking) {
+            window.AHITracking.startTryOn({
+                category: window.AR_PRODUCT.category,
+                productId: window.AR_PRODUCT.productId
+            });
+        }
+
         startButton.textContent = 'Camera started';
         stopButton.disabled = false;
 
