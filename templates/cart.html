@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f8f3e9">
+  <title>Shopping Bag | LUMIAR</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{--ivory:#f8f3e9;--paper:#fffdf9;--gold:#c9a36b;--deep:#a87942;--ink:#24211d;--muted:#746b60;--line:rgba(36,33,29,.14);--serif:"Cormorant Garamond",Georgia,serif;--sans:"Manrope",Arial,sans-serif;--shadow:0 18px 50px rgba(43,32,19,.08)}
+    *{box-sizing:border-box}body{margin:0;background:var(--ivory);color:var(--ink);font-family:var(--sans);font-size:14px}.shell{width:min(100% - 40px,1120px);margin:auto}a{color:inherit;text-decoration:none}button,input,textarea{font:inherit}button{cursor:pointer}.site-header{border-bottom:1px solid var(--line);padding:20px 0}.header-inner{display:flex;align-items:center;justify-content:space-between;gap:20px}.brand{font:600 34px/.9 var(--serif);letter-spacing:.15em}.brand span{color:var(--deep)}.back{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.12em}.page-title{padding:48px 0 24px}.eyebrow{color:var(--deep);font-size:10px;text-transform:uppercase;letter-spacing:.24em;font-weight:700}.page-title h1{font:400 clamp(42px,6vw,64px)/1 var(--serif);margin:10px 0}.page-title p{color:var(--muted);line-height:1.8}.layout{display:grid;grid-template-columns:1.25fr .75fr;gap:26px;align-items:start;padding-bottom:70px}.panel{background:var(--paper);border:1px solid var(--line);padding:24px;box-shadow:var(--shadow)}.panel h2{font:500 28px var(--serif);margin:0 0 20px}.cart-row{display:grid;grid-template-columns:100px 1fr;gap:16px;padding:18px 0;border-bottom:1px solid var(--line)}.cart-row:first-child{padding-top:0}.cart-row img{width:100px;height:110px;object-fit:contain;background:#f1ebe2;padding:8px}.item-name{font:500 23px var(--serif);margin:0 0 4px}.muted{color:var(--muted);font-size:12px}.item-controls{display:flex;align-items:center;gap:8px;margin-top:14px;flex-wrap:wrap}.qty-btn,.remove-btn{border:1px solid var(--line);background:transparent;padding:7px 10px}.remove-btn{color:#8c3f33}.line-price{font-weight:700;margin-left:auto}.field{display:grid;gap:6px;margin-bottom:14px}.field label{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}.field input,.field textarea{width:100%;border:1px solid var(--line);background:#fff;padding:12px 13px;outline:none}.field input:focus,.field textarea:focus{border-color:var(--deep)}.field textarea{min-height:90px;resize:vertical}.btn{width:100%;border:1px solid var(--ink);background:var(--ink);color:var(--ivory);padding:14px 16px;text-transform:uppercase;letter-spacing:.11em;font-size:10px;font-weight:700}.btn:hover{background:var(--deep);border-color:var(--deep)}.btn:disabled{opacity:.45;cursor:not-allowed}.subtotal{display:flex;justify-content:space-between;align-items:center;margin:18px 0;font-weight:700;font-size:16px}.notice{padding:12px 14px;background:#f2e8d8;color:#65513a;font-size:12px;line-height:1.7;margin-bottom:18px}.message{display:none;padding:14px;background:#f0eadf;margin:14px 0;line-height:1.7}.empty{padding:32px 0;color:var(--muted);line-height:1.8}.footer{padding:24px 0;background:var(--ink);color:#c8c0b5;font-size:10px}.footer .shell{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}.test-label{display:inline-block;padding:5px 8px;background:#f0e3ca;color:#7a5626;font-size:9px;text-transform:uppercase;letter-spacing:.08em;margin-top:12px}
+    @media(max-width:800px){.layout{grid-template-columns:1fr}.page-title{padding-top:34px}.panel{padding:18px}.shell{width:min(100% - 28px,1120px)}}
+  </style>
+</head>
+<body data-demo-checkout="{{ 'true' if demo_checkout_enabled else 'false' }}">
+  <header class="site-header"><div class="shell header-inner"><a class="brand" href="/">LUMI<span>AR</span></a><a class="back" href="/">← Continue shopping</a></div></header>
+  <main class="shell">
+    <section class="page-title"><span class="eyebrow">Your selection</span><h1>Shopping bag</h1><p>Review your pieces and enter delivery details to place your order.</p></section>
+    <div class="layout">
+      <section class="panel"><h2>Your pieces <span id="itemCount" class="muted"></span></h2><div id="cartItems"><p class="empty">Loading your bag…</p></div><div id="emptyState" class="empty" hidden>Your shopping bag is empty. <a href="/">Explore the collection →</a></div></section>
+      <section class="panel">
+        <h2>Delivery details</h2>
+        {% if demo_checkout_enabled %}<div class="notice"><strong>Demo checkout:</strong> this will create a clearly marked test order. No real payment is processed or charged.</div>{% else %}<div class="notice"><strong>Checkout status:</strong> live payment processing is not connected. You can submit an order request, which will remain pending until your business confirms payment.</div>{% endif %}
+        <form id="checkoutForm">
+          <div class="field"><label for="customerName">Full name</label><input id="customerName" name="customerName" autocomplete="name" required maxlength="160"></div>
+          <div class="field"><label for="customerEmail">Email</label><input id="customerEmail" name="customerEmail" type="email" autocomplete="email" required maxlength="254"></div>
+          <div class="field"><label for="customerPhone">Phone</label><input id="customerPhone" name="customerPhone" type="tel" autocomplete="tel" required minlength="7" maxlength="25"></div>
+          <div class="field"><label for="shippingAddress">Shipping address</label><textarea id="shippingAddress" name="shippingAddress" autocomplete="street-address" required minlength="8" maxlength="1000"></textarea></div>
+          <div class="subtotal"><span>Subtotal</span><span id="cartSubtotal">₹0.00</span></div>
+          <p class="muted">Final prices are validated on the server from the product catalogue.</p>
+          <div id="checkoutMessage" class="message" role="status" aria-live="polite"></div>
+          <button class="btn" id="checkoutButton" type="submit">{% if demo_checkout_enabled %}Complete demo order · no charge{% else %}Submit order request{% endif %}</button>
+        </form>
+      </section>
+    </div>
+  </main>
+  <footer class="footer"><div class="shell"><a href="/">LUMIAR</a><a href="/admin/analytics">Admin analytics</a><span>Virtual try-on · Shopping bag</span></div></footer>
+  <script src="{{ url_for('static', filename='js/store_cart.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/cart_page.js') }}"></script>
+</body>
+</html>

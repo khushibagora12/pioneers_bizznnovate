@@ -1,108 +1,133 @@
-# LUMIAR — Virtual Jewellery & Eyewear Try-On
+# Pioneers Bizznnovate — LUMIAR storefront, AR, cart and attribution analytics
 
-LUMIAR is a web-based Augmented Reality (AR) application that lets users browse and virtually try on jewellery and sunglasses in real time using their web camera.
+This repository is a single Flask monolith. The existing jewellery catalogue and AR try-on are preserved, with a local cart, demo checkout/order records, multi-touch attribution, and an admin analytics dashboard added.
 
-Everything runs directly inside the browser using client-side AI, providing a fast, smooth, and privacy-friendly virtual try-on experience without needing any app installation.
+## Features
 
-LUMIAR is designed to run directly in modern web browsers without requiring users to install a separate application. Its client-side computer vision pipeline processes camera frames locally on the device, helping protect user privacy by avoiding the transmission of camera footage to the application server.
+- Existing product catalogue and virtual try-on.
+- Cart on the catalogue and try-on pages; cart persists in browser local storage.
+- Checkout form captures delivery details and validates product IDs/prices on the Flask server.
+- Demo checkout creates a clearly labelled test order and does not charge a payment method.
+- Orders and order items preserve product IDs and `try_on_id` so purchases can be associated with try-on starts.
+- Server-generated `purchase` interaction events; the browser cannot declare an order paid by submitting an analytics event.
+- Referral links and click/touchpoint history.
+- First-touch, last-touch and linear multi-touch attribution.
+- Admin analytics page: `/admin/analytics`.
+- Dashboard views for real vs demo revenue/commission, order status, affiliates/referral links, product views, try-on starts and try-on-to-purchase analysis.
 
----
+## Local setup
 
-## Key Features Implemented
-
-### 1. Interactive Product Catalog
-- **Browse Products:** View available earrings and sunglasses with high-quality images, titles, and prices.
-- **Category Filters:** Easily filter products by **All**, **Earrings**, or **Shades**.
-- **Hero Showcase Carousel:** An interactive image carousel highlighting featured collections with automatic cycling and navigation controls.
-- **Instant Try-On Navigation:** Click **"Try On"** on any product card to immediately load it into the AR fitting room.
-
-### 2. Client-Side Face Landmark Detection (MediaPipe)
-- **Zero App Installation:** Works directly in any modern web browser.
-- **Real-Time 3D Face Tracking:** Powered by **Google MediaPipe Face Landmarker**, tracking key facial landmarks at 30+ FPS.
-- **100% Privacy Protected:** Camera video frames are processed entirely on your local device inside the browser. No video or photo data is ever sent to or stored on a server.
-- **Camera Controls:** Simple buttons to start and stop camera access anytime with clear status indicators.
-
-### 3. Realistic Jewellery Scaling & Placement
-- **Physical Dimension Support:** Product metadata includes real-world measurements (`width_mm` and `height_mm`).
-- **Automatic Face-Scale Estimation:** Calculates distance between facial features (such as eye corners and temple width) to determine the user's distance from the camera.
-- **Accurate Aspect Ratio:** Preserves original product proportions so jewellery and eyewear look natural without stretching.
-- **Specific Feature Anchoring:**
-  - **Earrings:** Automatically anchored to the left and right earlobe landmarks, tilting naturally with head movements.
-  - **Sunglasses (Shades):** Centered on the bridge of the nose and aligned horizontally across the eyes and temples.
-
-### 4. Try-On Capture & Details
-- **Product Overview Panel:** Displays the selected item's image, title, category, price, and dimensions right next to the live camera feed.
-- **Capture Look:** Take a snapshot of your virtual try-on preview to review your look.
-- **Seamless Product Switching:** Quickly switch between designs without restarting the camera feed.
-
----
-
-## Tech Stack
-
-- **Backend:** Python, Flask, Gunicorn
-- **Computer Vision:** Google MediaPipe Tasks Vision (`FaceLandmarker`)
-- **Rendering & AR:** Three.js, HTML5 Canvas, WebGL
-- **Frontend:** HTML5, Modern CSS (Responsive & Mobile-Friendly), Vanilla JavaScript
-
----
-
-## Project Structure
-
-```text
-Ahi-ar/
-├── app.py                      # Flask application entry point
-├── requirements.txt            # Python dependencies
-├── routes/
-│   └── jewellery.py            # API routes and page controllers
-├── service/
-│   └── jewelleryService.py     # Product scanning and physical metadata
-├── static/
-│   ├── images/
-│   │   ├── jewellery/          # Original catalog images (earrings, shades)
-│   │   └── processed/          # Transparent PNG cutouts for AR overlay
-│   └── js/
-│       ├── ar.js               # AR loop, camera streaming & MediaPipe setup
-│       ├── earrings.js         # Earlobe tracking and earring positioning
-│       ├── glasses.js          # Sunglasses alignment and bridge tracking
-│       ├── dashboard.js        # Catalog filtering & carousel logic
-│       └── try_on.js           # Try-on page product info & UI lifecycle
-└── templates/
-    ├── dashboard.html          # Storefront catalog page
-    └── try_on.html             # Virtual AR try-on room
-```
-
----
-
-## How to Run Locally
-
-### 1. Clone the repository
 ```bash
-git clone https://github.com/khushibagora12/pioneers_bizznnovate.git
-cd pioneers_bizznnovate
-```
-
-### 2. Set up virtual environment
-```bash
-# Windows
-python -m venv venv
-venv\Scripts\activate
-
-# macOS / Linux
-python3 -m venv venv
-source venv/bin/activate
-```
-
-### 3. Install dependencies
-```bash
+python -m venv .venv
+source .venv/bin/activate       # Windows: .venv\\Scripts\\activate
 pip install -r requirements.txt
+cp .env.example .env
 ```
 
-### 4. Start the application
+Edit `.env` and replace the development `ADMIN_API_KEY` and `PAYMENT_WEBHOOK_SECRET` with generated secrets. Never commit `.env`.
+
+Start the single Flask app:
+
 ```bash
 python app.py
 ```
-Open your browser and navigate to:
+
+Visit:
+
+- Storefront: `http://localhost:5000/`
+- Cart and checkout: `http://localhost:5000/cart`
+- Admin sales/attribution/scale-friction dashboard: `http://localhost:5000/admin/analytics`
+- Health endpoint: `http://localhost:5000/api/health`
+
+In the admin page, enter `ADMIN_API_KEY` from your local `.env` and select **Connect dashboard**. From there you can register affiliates, create referral links, switch attribution models, review sales/orders, and inspect product-level try-on-to-purchase signals.
+
+Seed sample affiliates and referral links in the same database:
+
+```bash
+python seed_demo.py
 ```
-http://127.0.0.1:5000
+
+Then open `http://localhost:5000/r/demo-insta-a` and `http://localhost:5000/r/demo-blog-b` in the same browser profile. They record referral touchpoints and redirect to the actual AR product route.
+
+## Demo checkout vs real checkout
+
+The server defaults `ENABLE_DEMO_CHECKOUT` to `false` unless explicitly configured. In local `.env`, the example sets it to `true` for development. `ENABLE_DEMO_CHECKOUT=true` enables a simulated storefront checkout. Every such order is recorded with `is_test=1`; the UI explicitly tells the user no payment is collected, and the admin dashboard reports demo and real figures separately. This is only for prototypes, judging and local testing. It is not a payment gateway.
+
+With `ENABLE_DEMO_CHECKOUT=false`, the checkout records a pending order request. It is not a paid purchase and is not attributed as revenue until a trusted payment/order integration confirms payment.
+
+For a real shop, connect the existing checkout flow to a payment provider and call the internal payment-confirmation logic only after verifying the provider's webhook signature. Do not enable public simulated checkout for normal production sales.
+
+## Admin dashboard
+
+Open `/admin/analytics`, enter the `ADMIN_API_KEY` from `.env`/Render, and select **Connect dashboard**. The key is sent only in request headers and retained in the browser tab's session storage. All reporting and management APIs still require the key.
+
+The admin page supports:
+
+- Creating affiliate records with a commission rate.
+- Creating and copying referral links.
+- Choosing first-touch, last-touch or linear attribution for reporting.
+- Reviewing credited real orders/revenue/commission separately from demo/test records.
+- Reviewing recent orders and pending order requests (pending requests are not shown as paid revenue).
+- Reviewing product views, try-on starts and purchases tied to the same `try_on_id`.
+- Opening the admin page from the storefront header or footer.
+
+Set only one attribution model as the official model for commission settlement. Other models are alternatives for analysis, not additional commissions.
+
+## Tracking contract with the AR code
+
+The frontend emits only:
+
+- `product_view` when the selected product/try-on page loads successfully.
+- `try_on_started` after camera and landmark setup succeeds, with a unique `tryOnId`.
+
+The backend emits `purchase` when the order/payment flow marks an order paid. It is deliberately rejected by the public `/api/track/events` endpoint.
+
+Cart line items carry the most recent matching `tryOnId` when one exists. The checkout backend verifies that the try-on ID was recorded for the same visitor and product before storing it on the order item. If a visitor adds an item without a try-on, it can still be ordered, but it will not count as a try-on-to-purchase conversion.
+
+Product identifiers are namespaced (`earrings:1`, `shades:1`) because the existing catalogue uses numeric IDs that can overlap across categories.
+
+## Render deployment
+
+Continue deploying the existing GitHub repository and existing Render service; don't create a second app. Keep the current start command:
+
+```bash
+gunicorn app:app
 ```
-Allow camera access when prompted on the try-on page to begin testing! 
+
+Set environment variables in Render (don't upload `.env`):
+
+```text
+FLASK_ENV=production
+FRONTEND_BASE_URL=https://ahi-jewelry.onrender.com
+FRONTEND_ORIGIN=https://ahi-jewelry.onrender.com
+BACKEND_PUBLIC_URL=https://ahi-jewelry.onrender.com
+COOKIE_SECURE=true
+ADMIN_API_KEY=<new strong secret>
+PAYMENT_WEBHOOK_SECRET=<different new strong secret>
+ENABLE_DEMO_PURCHASES=false
+ENABLE_DEMO_CHECKOUT=true
+```
+
+`ENABLE_DEMO_CHECKOUT=true` is shown here only if you need a public demo checkout for a presentation. It creates only test records, but still allows people to generate test orders. Set it to `false` when connecting real payment processing or after the demo.
+
+SQLite must live on persistent storage on Render. If you have attached a Render disk mounted at `/var/data`, configure:
+
+```text
+DATABASE_PATH=/var/data/ahi_tracking.db
+```
+
+Only use that path if the disk exists and is mounted there. SQLite on an ephemeral filesystem may be lost on restart/redeploy. If a persistent disk is unavailable or write concurrency grows, migrate to a hosted PostgreSQL database.
+
+## Tests
+
+Run:
+
+```bash
+python -m pytest -q
+```
+
+The tests cover the existing referral/attribution calculation paths. Also manually test the user journey: open a tracked link, try on a product, add it to the bag, submit the demo checkout, and verify the resulting test order and attribution in `/admin/analytics`.
+
+## Analytics limitations
+
+The current implementation has only product views, try-on starts and backend purchases. It does not record add-to-cart or try-on-completed events, by design. Consequently, it reports try-on-to-purchase association, not cart abandonment or AR completion rate. A low conversion rate is a signal for investigation, not proof of incorrect product scale.
