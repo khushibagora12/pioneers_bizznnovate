@@ -1,2 +1,14 @@
-venv
-__pycache__
+# Local secrets
+.env
+
+# Local databases and SQLite files
+instance/
+*.db
+*.db-shm
+*.db-wal
+
+# Python development files
+.venv/
+__pycache__/
+.pytest_cache/
+*.py[cod]

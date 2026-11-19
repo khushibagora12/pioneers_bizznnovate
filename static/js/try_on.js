@@ -12,6 +12,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const productSize = document.getElementById('productSize');
     const changeProduct = document.getElementById('changeProduct');
     const captureButton = document.getElementById('captureButton');
+    const addToBagButton = document.getElementById('addToBagButton');
+    const tryOnCartCount = document.getElementById('tryOnCartCount');
     const status = document.getElementById('status');
 
     const categoryLabels = {
@@ -57,8 +59,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             throw new Error('Selected product was not found.');
         }
 
-        // Fetch the AR-ready image URL.
+        window._AHI_CURRENT_PRODUCT = { ...product, category };
 
+        // Fetch the AR-ready image URL.
         const arResponse = await fetch(
             `/api/try_on/${encodeURIComponent(category)}/${encodeURIComponent(productId)}`
         );
@@ -103,6 +106,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             height_mm: product.height_mm
         };
 
+        // The project has no separate product-detail page: loading this
+        // selected-product try-on page is counted as the product view.
+        window.AHITracking?.trackProductView({ category, productId });
+        if (addToBagButton) addToBagButton.disabled = false;
+        if (tryOnCartCount && window.AHICart) tryOnCartCount.textContent = String(window.AHICart.count());
+
         window.dispatchEvent(
             new CustomEvent('ar-product-ready', {
                 detail: window.AR_PRODUCT
@@ -128,6 +137,22 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (captureButton) captureButton.disabled = true;
     }
+
+    addToBagButton?.addEventListener('click', () => {
+        if (!window.AR_PRODUCT || !window.AHICart) return;
+        const source = window._AHI_CURRENT_PRODUCT || null;
+        const item = source || {
+            id: productId,
+            name: productName.textContent,
+            image: window.AR_PRODUCT.imageUrl,
+            price: Number((productPrice.textContent || '').replace(/[^0-9.]/g, '')),
+            category
+        };
+        window.AHICart.add({ ...item, id: productId, category });
+        if (tryOnCartCount) tryOnCartCount.textContent = String(window.AHICart.count());
+        setStatus('Added to your shopping bag. You can continue exploring or open your bag.');
+        addToBagButton.textContent = 'Added to bag ✓';
+    });
 
     // Return to the product dashboard.
     changeProduct?.addEventListener('click', () => {

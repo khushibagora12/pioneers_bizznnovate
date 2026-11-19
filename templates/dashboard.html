@@ -504,6 +504,13 @@
             line-height: 1.7;
         }
 
+        .product-info .product-price {
+            color: var(--gold-deep);
+            font-size: 14px;
+            font-weight: 700;
+            margin-top: 7px;
+        }
+
         .try-on-btn {
             display: flex;
             justify-content: center;
@@ -527,6 +534,72 @@
             border-color: var(--gold-deep);
             background: var(--gold-deep);
             color: white;
+        }
+
+        .product-actions-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .product-actions-row .try-on-btn,
+        .add-to-bag-btn {
+            width: 100%;
+            margin-top: 0;
+            min-height: 42px;
+            padding: 10px 8px;
+            font-size: 9px;
+            letter-spacing: .08em;
+        }
+
+        .add-to-bag-btn {
+            border: 1px solid var(--gold-deep);
+            border-radius: 0;
+            background: transparent;
+            color: var(--gold-deep);
+            font-weight: 700;
+            text-transform: uppercase;
+            transition: background .2s, color .2s;
+        }
+
+        .add-to-bag-btn:hover {
+            background: var(--gold-deep);
+            color: white;
+        }
+
+        .cart-link span {
+            display: inline-grid;
+            place-items: center;
+            min-width: 19px;
+            height: 19px;
+            padding: 0 5px;
+            border-radius: 50%;
+            background: var(--gold-deep);
+            color: white;
+            font-size: 10px;
+            letter-spacing: 0;
+        }
+
+        .store-toast {
+            position: fixed;
+            right: 22px;
+            bottom: 22px;
+            z-index: 100;
+            max-width: min(360px, calc(100vw - 44px));
+            padding: 14px 18px;
+            background: var(--ink);
+            color: var(--ivory);
+            box-shadow: var(--shadow);
+            opacity: 0;
+            transform: translateY(8px);
+            pointer-events: none;
+            transition: .2s ease;
+        }
+
+        .store-toast.visible {
+            opacity: 1;
+            transform: translateY(0);
         }
 
         .empty-state {
@@ -810,6 +883,8 @@
 
             <div class="header-actions">
                 <a href="#catalog" aria-label="Explore collection">Explore collection ↗</a>
+                <a href="/admin/analytics" aria-label="Admin analytics">Admin</a>
+                <a class="cart-link" href="/cart" aria-label="Shopping bag">Bag <span id="cartCount">0</span></a>
             </div>
         </div>
 
@@ -901,10 +976,12 @@
         <div class="footer-inner shell">
             <a class="footer-brand" href="#top">LUMI<span>AR</span></a>
             <span>DISCOVER YOUR LOOK · VIRTUAL TRY-ON</span>
-            <a href="#catalog">Back to collection ↑</a>
+            <span class="footer-links"><a href="/cart">Shopping bag</a> · <a href="/admin/analytics">Admin analytics</a></span>
         </div>
     </footer>
 
+    <div id="storeToast" class="store-toast" role="status" aria-live="polite"></div>
+    <script src="{{ url_for('static', filename='js/store_cart.js') }}"></script>
     <!-- Keep the original Flask static route unchanged. -->
     <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
     <script>

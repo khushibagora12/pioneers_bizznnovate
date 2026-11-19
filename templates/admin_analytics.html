@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f7f4ee">
+  <title>Admin Analytics | LUMIAR</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg:#f4f1eb;--card:#fffdf9;--ink:#24211d;--muted:#766e64;--gold:#b68a50;--line:#e8e1d6;--green:#3b6b4b;--red:#9a4b3f;--amber:#8d682e;--shadow:0 10px 32px rgba(40,31,20,.05);--serif:"Cormorant Garamond",Georgia,serif;--sans:"Manrope",Arial,sans-serif}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:13px}.layout{display:grid;grid-template-columns:240px minmax(0,1fr);min-height:100vh}.sidebar{background:#292620;color:#eee4d4;padding:28px 20px;display:flex;flex-direction:column;gap:26px}.brand{font:600 30px/.9 var(--serif);letter-spacing:.12em;color:#fffdf9}.brand span{color:#d6b27c}.sidebar small{color:#b9ad9c;text-transform:uppercase;letter-spacing:.17em;font-size:9px}.side-nav{display:grid;gap:8px}.side-nav a{padding:11px 12px;color:#e7ddcd;border:1px solid transparent}.side-nav a.active,.side-nav a:hover{background:rgba(255,255,255,.07);border-color:rgba(214,178,124,.26)}.side-footer{margin-top:auto;color:#b9ad9c;font-size:11px;line-height:1.7}.main{min-width:0;padding:30px clamp(18px,3vw,42px) 50px}.topline{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;margin-bottom:24px}.eyebrow{font-size:9px;text-transform:uppercase;letter-spacing:.2em;color:var(--gold);font-weight:800}.topline h1{font:400 clamp(36px,4vw,54px)/1 var(--serif);margin:8px 0}.topline p{margin:0;color:var(--muted);line-height:1.6}.back-link{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);white-space:nowrap}.auth-card,.panel{background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);padding:20px;margin-bottom:18px}.auth-row{display:flex;gap:10px;align-items:end;flex-wrap:wrap}.field{display:grid;gap:6px;flex:1;min-width:220px}.field label{font-size:9px;text-transform:uppercase;letter-spacing:.13em;color:var(--muted)}input,select{width:100%;padding:11px 12px;border:1px solid var(--line);background:#fff;font:inherit;color:var(--ink)}.btn{border:1px solid var(--ink);background:var(--ink);color:#fff8ec;padding:12px 15px;font:700 10px var(--sans);letter-spacing:.1em;text-transform:uppercase;cursor:pointer;white-space:nowrap}.btn.secondary{background:transparent;color:var(--ink)}.btn:disabled{opacity:.5;cursor:wait}.status{padding:10px 12px;margin-top:10px;background:#f3eee4;color:var(--muted);display:none;line-height:1.6}.status.error{display:block;background:#f8e9e6;color:var(--red)}.status.ok{display:block;background:#e8f1e8;color:var(--green)}.demo-banner{padding:11px 14px;border:1px solid #e8d8b8;background:#fbf2df;color:#765a2a;line-height:1.6;margin-bottom:18px}.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px;margin-bottom:18px}.kpi{background:var(--card);border:1px solid var(--line);padding:18px;box-shadow:var(--shadow);min-width:0}.kpi .label{color:var(--muted);font-size:9px;letter-spacing:.12em;text-transform:uppercase}.kpi .value{font-size:clamp(22px,2.5vw,32px);font-weight:600;margin:8px 0 4px;overflow-wrap:anywhere}.kpi .caption{font-size:10px;color:var(--muted);line-height:1.5}.grid-two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px}.panel-head{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;margin-bottom:14px}.panel h2{font:500 27px/1 var(--serif);margin:0}.panel p{color:var(--muted);line-height:1.6;margin:7px 0 0;font-size:11px}.model-select{max-width:160px}.table-wrap{overflow:auto}table{border-collapse:collapse;width:100%;min-width:520px}th,td{text-align:left;padding:12px 10px;border-bottom:1px solid var(--line);vertical-align:top}th{color:var(--muted);font-size:9px;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap}td{font-size:11px;line-height:1.6}tbody tr:last-child td{border-bottom:0}.pill{display:inline-block;border-radius:100px;padding:4px 8px;background:#eee9df;color:#665b4c;font-size:9px;white-space:nowrap}.pill.warn{background:#f6ecd9;color:var(--amber)}.pill.good{background:#e7f0e6;color:var(--green)}.pill.bad{background:#f7e7e4;color:var(--red)}.muted{color:var(--muted)}.full{grid-column:1/-1}.bar-list{display:grid;gap:12px;margin-top:15px}.bar-item{display:grid;grid-template-columns:minmax(70px,130px) minmax(100px,1fr) 52px;gap:9px;align-items:center;font-size:10px}.bar-bg{height:7px;background:#eee8dd;border-radius:10px;overflow:hidden}.bar-fill{height:100%;background:var(--gold);border-radius:10px}.empty{padding:22px;text-align:center;color:var(--muted)}.footnote{color:var(--muted);font-size:10px;line-height:1.7;margin-top:12px}.hidden{display:none!important}
+    @media(max-width:1050px){.layout{grid-template-columns:190px minmax(0,1fr)}.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.grid-two{grid-template-columns:1fr}}
+    @media(max-width:680px){.layout{display:block}.sidebar{padding:14px 18px;flex-direction:row;align-items:center;justify-content:space-between;gap:12px}.sidebar .side-nav,.sidebar .side-footer,.sidebar small{display:none}.brand{font-size:26px}.main{padding:22px 14px 40px}.topline{display:block}.back-link{display:inline-block;margin-top:14px}.kpis{gap:8px}.kpi{padding:13px}.panel,.auth-card{padding:15px}.panel-head{display:block}.model-select{margin-top:12px}.auth-row .btn{width:100%}}
+  </style>
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <a class="brand" href="/">LUMI<span>AR</span></a>
+    <div><small>Business intelligence</small><nav class="side-nav"><a class="active" href="#overview">Overview</a><a href="#attribution">Attribution</a><a href="#friction">Product friction</a><a href="#orders">Orders</a></nav></div>
+    <div class="side-footer">AHI Jewellery<br>Private admin reports<br><a href="/" style="color:#d6b27c">← Back to storefront</a></div>
+  </aside>
+  <main class="main">
+    <header class="topline"><div><span class="eyebrow">AHI Jewellery · Admin workspace</span><h1>Sales & customer journey</h1><p>Review referral credit, order activity and products that may need a closer look.</p></div><a class="back-link" href="/">View storefront ↗</a></header>
+    <section class="auth-card">
+      <div class="auth-row">
+        <div class="field"><label for="adminKey">Admin API key</label><input id="adminKey" type="password" autocomplete="current-password" placeholder="Enter the ADMIN_API_KEY from Render or .env"></div>
+        <button class="btn" id="connectBtn" type="button">Connect dashboard</button>
+        <button class="btn secondary" id="refreshBtn" type="button" disabled>Refresh data</button>
+      </div>
+      <div id="connectionStatus" class="status" role="status" aria-live="polite"></div>
+      <p class="footnote">The key is stored in this browser tab's session storage only. Admin APIs remain protected; never paste this key into public frontend source code.</p>
+    </section>
+    <div class="demo-banner">Demo orders and real orders are separated in reports. A demo checkout does not charge a payment method and must not be treated as real revenue.</div>
+    <section id="overview" class="kpis">
+      <article class="kpi"><div class="label">Referral visits</div><div class="value" id="kpiReferrals">—</div><div class="caption">Recorded tracked referral touchpoints</div></article>
+      <article class="kpi"><div class="label">Product views</div><div class="value" id="kpiViews">—</div><div class="caption">Recorded product-view events</div></article>
+      <article class="kpi"><div class="label">Try-on starts</div><div class="value" id="kpiTryons">—</div><div class="caption">Distinct try-on attempts</div></article>
+      <article class="kpi"><div class="label">Orders placed</div><div class="value" id="kpiOrders">—</div><div class="caption" id="kpiOrdersCaption">Paid and pending orders</div></article>
+      <article class="kpi"><div class="label">Real paid revenue</div><div class="value" id="kpiRevenue">—</div><div class="caption">Excludes test orders</div></article>
+      <article class="kpi"><div class="label">Demo order value</div><div class="value" id="kpiDemoRevenue">—</div><div class="caption">Simulated checkout only</div></article>
+      <article class="kpi"><div class="label">Real paid orders</div><div class="value" id="kpiRealOrders">—</div><div class="caption">Verified non-test purchases</div></article>
+      <article class="kpi"><div class="label">Pending orders</div><div class="value" id="kpiPending">—</div><div class="caption">Awaiting payment/confirmation</div></article>
+    </section>
+    <section class="grid-two">
+      <article class="panel">
+        <div class="panel-head"><div><h2>Register an affiliate</h2><p>Create the influencer record used by tracked links.</p></div></div>
+        <form id="affiliateForm">
+          <div class="field"><label for="affiliateCode">Unique affiliate code</label><input id="affiliateCode" required maxlength="80" placeholder="creator-sakshi"></div>
+          <div class="field"><label for="affiliateName">Display name</label><input id="affiliateName" required maxlength="200" placeholder="Creator name"></div>
+          <div class="field"><label for="affiliateRate">Commission rate (%)</label><input id="affiliateRate" type="number" min="0" max="100" step="0.1" value="10" required></div>
+          <button class="btn" type="submit">Create affiliate</button>
+        </form>
+        <div id="affiliateMessage" class="status" role="status" aria-live="polite"></div>
+      </article>
+      <article class="panel">
+        <div class="panel-head"><div><h2>Generate a referral link</h2><p>Create a link to the storefront or a particular try-on page.</p></div></div>
+        <form id="linkForm">
+          <div class="field"><label for="linkAffiliate">Affiliate</label><select id="linkAffiliate" required><option value="">Connect dashboard first</option></select></div>
+          <div class="field"><label for="linkSource">Source</label><select id="linkSource"><option value="instagram">Instagram</option><option value="youtube">YouTube</option><option value="jewellery-blog">Jewellery blog</option><option value="whatsapp">WhatsApp</option><option value="other">Other</option></select></div>
+          <div class="field"><label for="linkCampaign">Campaign</label><input id="linkCampaign" maxlength="200" placeholder="festive-2026"></div>
+          <div class="field"><label for="linkDestination">Destination path</label><input id="linkDestination" value="/" required placeholder="/try-on?category=earrings&product=1"><span class="footnote">Must be a path on this site, not an external URL.</span></div>
+          <button class="btn" type="submit">Generate referral URL</button>
+        </form>
+        <div id="linkMessage" class="status" role="status" aria-live="polite"></div>
+      </article>
+      <article class="panel full">
+        <div class="panel-head"><div><h2>Referral links</h2><p>Copy the generated URL and share it with the matching influencer.</p></div><button class="btn secondary" id="refreshLinksBtn" type="button" disabled>Refresh links</button></div>
+        <div class="table-wrap"><table><thead><tr><th>Affiliate</th><th>Source / campaign</th><th>Destination</th><th>Referral URL</th><th>State</th></tr></thead><tbody id="referralLinkRows"><tr><td colspan="5" class="empty">Connect the dashboard to load links.</td></tr></tbody></table></div>
+      </article>
+    </section>
+    <section id="attribution" class="panel">
+      <div class="panel-head"><div><h2>Multi-touch attribution</h2><p>Credit assigned to affiliates for paid orders. Demo attribution is shown separately.</p></div><div class="field model-select"><label for="modelSelect">Attribution model</label><select id="modelSelect"><option value="linear">Linear</option><option value="first_touch">First touch</option><option value="last_touch">Last touch</option></select></div></div>
+      <div class="table-wrap"><table><thead><tr><th>Affiliate</th><th>Real orders</th><th>Real revenue credit</th><th>Real commission</th><th>Demo revenue credit</th><th>Demo commission</th></tr></thead><tbody id="attributionRows"><tr><td colspan="6" class="empty">Connect the dashboard to load data.</td></tr></tbody></table></div>
+      <div class="footnote">Attribution credit is a reporting rule, not proof that a particular affiliate caused the purchase. Choose one approved model for actual commission settlement.</div>
+    </section>
+    <section id="friction" class="panel">
+      <div class="panel-head"><div><h2>Product scale-friction analysis</h2><p>Try-on starts linked to paid purchases within seven days. Low conversion is a review signal, not proof of scale confusion.</p></div><button class="btn secondary" id="refreshFrictionBtn" type="button" disabled>Refresh analysis</button></div>
+      <div class="table-wrap"><table><thead><tr><th>Product ID</th><th>Views / unique visitors</th><th>Try-on starts</th><th>View visitors → try-on visitors</th><th>Try-on purchases</th><th>Try-on → purchase</th><th>Flag</th></tr></thead><tbody id="frictionRows"><tr><td colspan="7" class="empty">Connect the dashboard to load data.</td></tr></tbody></table></div>
+      <div class="footnote">Products with fewer than 30 try-on starts are labelled insufficient data. The initial low-conversion threshold is a heuristic and should be adjusted using category baselines and more observations.</div>
+    </section>
+    <section id="orders" class="panel">
+      <div class="panel-head"><div><h2>Recent orders</h2><p>Customer order requests and paid checkouts. Test orders are visibly marked.</p></div></div>
+      <div class="table-wrap"><table><thead><tr><th>Order</th><th>Customer</th><th>Items</th><th>Amount</th><th>Status</th><th>Type</th><th>Created</th></tr></thead><tbody id="orderRows"><tr><td colspan="7" class="empty">Connect the dashboard to load data.</td></tr></tbody></table></div>
+      <div class="footnote">Customer contact/address details are intentionally not displayed on this overview page. Add a separately permissioned fulfilment view if your team needs to use addresses to ship orders.</div>
+    </section>
+  </main>
+</div>
+<script src="{{ url_for('static', filename='js/admin_analytics.js') }}"></script>
+</body>
+</html>

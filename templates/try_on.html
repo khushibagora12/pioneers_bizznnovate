@@ -266,6 +266,12 @@
             color: #594737;
         }
 
+        #addToBagButton {
+            border: 1px solid #a87942;
+            background: #a87942;
+            color: white;
+        }
+
         #captureButton {
             border: none;
             background: #3e332a;
@@ -405,9 +411,15 @@
                         Capture look
                     </button>
 
+                    <button id="addToBagButton" type="button" disabled>
+                        Add to bag
+                    </button>
+
                     <button id="changeProduct" type="button">
                         Explore other designs
                     </button>
+
+                    <a class="back-link" href="/cart">View shopping bag (<span id="tryOnCartCount">0</span>)</a>
                 </div>
 
                 <!-- <div class="ar-adjustments">
@@ -457,6 +469,8 @@
         };
     </script>
 
+    <script src="{{ url_for('static', filename='js/store_cart.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/tracking.js') }}"></script>
     <script src="{{ url_for('static', filename='js/try_on.js') }}"></script>
     <script src="{{ url_for('static', filename='js/ar_adjustment.js') }}"></script>
     <script type="module" src="{{ url_for('static', filename='js/ar.js') }}"></script>
